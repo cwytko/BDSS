@@ -1,7 +1,7 @@
 version: '2'
 services:
   db:
-    image: postgres:9.5.3
+    image: postgres:9
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
       POSTGRES_DB: bdss
@@ -10,17 +10,15 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data/pgdata
   app:
-    build: .
+    build: ../..
+    image: bdss_metadata_repository
+    command: ./scripts/serve --public
     environment:
       DATABASE_URL: postgresql+psycopg2://bdss:topsecret@db/bdss
-      SESSION_KEY:
+      SESSION_KEY: ${SESSION_KEY}
     links:
       - db
-  web:
-    image: nginx:1.10
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - 80:80
-    links:
-      - app
+      - 5000:5000
+    volumes:
+      - ../..:/app
